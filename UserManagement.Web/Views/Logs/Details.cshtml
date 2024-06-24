@@ -1,0 +1,35 @@
+﻿@model UserManagement.Web.Models.Logs.LogDetailsViewModel
+<h2>Log Details</h2>
+
+<div class="table-responsive">
+    <table class="table table-striped">
+        <tr>
+            <th>Log Id</th>
+            <td>@Html.DisplayFor(model => model.Id)</td>
+        </tr>
+        <tr>
+            <th>Action</th>
+            <td>@Html.DisplayFor(model => model.Action)</td>
+        </tr>
+        <tr>
+            <th>Actioned By</th>
+            <td>@Html.DisplayFor(model => model.UserName)</td>
+        </tr>
+        <tr>
+            <th>Details</th>
+            <td>
+            @foreach (var detail in Model.DetailsList)
+            {
+              @detail
+              <br />
+            }
+            </td>
+        </tr>
+        <tr>
+            <th>Timestamp</th>
+            <td>@Html.DisplayFor(model => model.Timestamp)</td>
+        </tr>
+    </table>
+</div>
+
+<a class="btn btn-secondary" asp-controller="Logs" asp-action="List">Back to Logs List</a>

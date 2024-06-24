@@ -1,0 +1,79 @@
+﻿@model UserManagement.Web.Models.Users.UserDetailsViewModel
+<h2>User Details</h2>
+
+<div class="table-responsive">
+    <table class="table table-striped">
+        <tr>
+            <th>User Id</th>
+            <td>@Html.DisplayFor(model => model.Id)</td>
+        </tr>
+        <tr>
+            <th>Forename</th>
+            <td>@Html.DisplayFor(model => model.Forename)</td>
+        </tr>
+        <tr>
+            <th>Surname</th>
+            <td>@Html.DisplayFor(model => model.Surname)</td>
+        </tr>
+        <tr>
+            <th>Date of Birth</th>
+            <td>@Html.DisplayFor(model => model.DateOfBirth)</td>
+        </tr>
+        <tr>
+            <th>Email</th>
+            <td>@Html.DisplayFor(model => model.Email)</td>
+        </tr>
+        <tr>
+            <th>Status</th>
+            <td>@(Model.IsActive ? "Active" : "Not Active")</td>
+        </tr>
+    </table>
+</div>
+
+
+@if (Model.Logs != null && Model.LogDetailsList?.Count > 0) {
+<br>
+
+<h3>User Logs</h3>
+<div class="table-responsive">
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Log Id</th>
+                <th>Action</th>
+                <th>Actioned By</th>
+                <th>Details</th>
+                <th>Timestamp</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.LogDetailsList)
+            {
+                <tr>
+                    <td>
+                            @Html.DisplayFor(model => item.Id)
+                    </td>
+                    <td>
+                            @Html.DisplayFor(model => item.Action)
+                    </td>
+                    <td>
+                            @Html.DisplayFor(model => item.UserName)
+                    </td>
+                    <td>
+                        @foreach (var detail in item.DetailsList)
+                        {
+                            @detail
+                            <br />
+                        }
+                    </td>
+                    <td>
+                        @Html.DisplayFor(model => item.Timestamp)
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+}
+
+<a class="btn btn-secondary" asp-controller="Users" asp-action="List">Back to Users List</a>

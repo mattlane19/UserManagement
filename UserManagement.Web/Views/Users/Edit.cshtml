@@ -1,0 +1,62 @@
+@model UserManagement.Web.Models.Users.UserDetailsViewModel
+
+<h2>@(Model.Id != 0 ? "Edit User" : "Add User")</h2>
+
+<form asp-controller="Users" asp-action="Save" asp-route-id="@Model.Id" method="post">
+    @Html.AntiForgeryToken()
+    <div class="table-responsive">
+        <table class="table table-striped">
+            @if (Model.Id != 0)
+            {
+                <tr>
+                    <th>Id</th>
+                    <td>@Html.TextBoxFor(model => model.Id, new { @class = "form-control", @readonly = true })</td>
+                </tr>
+            }
+            <tr>
+                <th>Forename</th>
+                <td>
+                    @Html.TextBoxFor(model => model.Forename, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(model => model.Forename)
+                </td>
+            </tr>
+            <tr>
+                <th>Surname</th>
+                <td>
+                    @Html.TextBoxFor(model => model.Surname, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(model => model.Surname)
+                </td>
+            </tr>
+            <tr>
+                <th>Date of Birth</th>
+                <td>
+                    <input asp-for="DateOfBirth" class="form-control" type="date" />
+                    @Html.ValidationMessageFor(model => model.DateOfBirth)
+                </td>
+            </tr>
+            <tr>
+                <th>Email</th>
+                <td>
+                    @Html.TextBoxFor(model => model.Email, new { @class = "form-control", type="email" })
+                    @Html.ValidationMessageFor(model => model.Email)
+                </td>
+            </tr>
+            <tr>
+                <th>Status</th>
+                <td>
+                    @Html.DropDownListFor(model => model.IsActive, new List<SelectListItem>()
+                    {
+                        new SelectListItem() { Text = "Active", Value = "True" },
+                        new SelectListItem() { Text = "Not Active", Value = "False"}
+                    }, new { @id = "IsActive", @class = "form-control" })
+                    @Html.ValidationMessageFor(model => model.IsActive)
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="form-group">
+        <input type="submit" value="Save" class="btn btn-primary" />
+        <a class="btn btn-secondary" asp-controller="Users" asp-action="List">Cancel</a>
+    </div>
+</form>
