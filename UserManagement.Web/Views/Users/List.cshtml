@@ -9,6 +9,7 @@
                 <th>Id</th>
                 <th>Forename</th>
                 <th>Surname</th>
+                <th>Date of Birth</th>
                 <th>Email</th>
                 <th>Account Active</th>
                 <th style="width: 1px;"></th>
@@ -19,16 +20,19 @@
             {
                 <tr>
                     <td>
-                        @item.Id
+                        @Html.DisplayFor(model => item.Id)
                     </td>
                     <td>
-                        @item.Forename
+                        @Html.DisplayFor(model => item.Forename)
                     </td>
                     <td>
-                        @item.Surname
+                        @Html.DisplayFor(model => item.Surname)
                     </td>
                     <td>
-                        @item.Email
+                        @Html.DisplayFor(model => item.DateOfBirth)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(model => item.Email)
                     </td>
                     <td>
                         @(item.IsActive ? "Yes" : "No")
@@ -39,9 +43,9 @@
                                 Actions
                             </button>
                             <ul class="dropdown-menu" aria-labelledby="btnToggleActions">
-                                <li><a class="dropdown-item" href="#">View</a></li>
-                                <li><a class="dropdown-item" href="#">Edit</a></li>
-                                <li><a class="dropdown-item" href="#">Delete</a></li>
+                                <li><a class="dropdown-item" asp-controller="Users" asp-action="Details" asp-route-id="@item.Id">View</a></li>
+                                <li><a class="dropdown-item" asp-controller="Users" asp-action="Edit" asp-route-id="@item.Id">Edit</a></li>
+                                <li><a class="dropdown-item" asp-controller="Users" asp-action="Delete" asp-route-id="@item.Id">Delete</a></li>
                             </ul>
                         </div>
                     </td>
@@ -54,12 +58,11 @@
 <div>
     <div class="btn-group" role="group">
         <a asp-controller="Users" asp-action="List" class="btn btn-default">Show All</a>
-        <a href="#" class="btn btn-default">Active Only</a>
-        <a href="#" class="btn btn-default">Non Active</a>
+        <a asp-controller="Users" asp-action="List" asp-route-active="true" class="btn btn-default">Active Only</a>
+        <a asp-controller="Users" asp-action="List" asp-route-active="false" class="btn btn-default">Non Active</a>
     </div>
 
-    <a href="#" class="btn btn-primary float-end">
+    <a asp-controller="Users" asp-action="Edit" class="btn btn-primary float-end">
         Add User
     </a>
 </div>
-

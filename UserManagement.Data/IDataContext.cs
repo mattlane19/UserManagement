@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 
 namespace UserManagement.Data;
 
@@ -11,6 +10,20 @@ public interface IDataContext
     /// <typeparam name="TEntity"></typeparam>
     /// <returns></returns>
     IQueryable<TEntity> GetAll<TEntity>() where TEntity : class;
+
+    /// <summary>
+    /// Get a single item by Id
+    /// </summary>
+    /// <typeparam name="TEntity"></typeparam>
+    /// <returns></returns>
+    IQueryable<TEntity> GetById<TEntity>(long id) where TEntity : class;
+
+    /// <summary>
+    /// Get a single user by Id
+    /// </summary>
+    /// <typeparam name="TEntity"></typeparam>
+    /// <returns></returns>
+    IQueryable<TEntity> GetUserById<TEntity>(long id) where TEntity : class;
 
     /// <summary>
     /// Create a new item
