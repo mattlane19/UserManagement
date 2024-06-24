@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using Microsoft.AspNetCore.Authorization;
 using UserManagement.Models;
 using UserManagement.Services.Domain.Interfaces;
 using UserManagement.Web.Models.Logs;
@@ -6,6 +7,7 @@ using UserManagement.Web.Models.Users;
 
 namespace UserManagement.WebMS.Controllers;
 
+[Authorize]
 [Route("users")]
 public class UsersController : Controller
 {
@@ -39,7 +41,7 @@ public class UsersController : Controller
         return View(model);
     }
 
-    [HttpGet("users/details/{id}")]
+    [HttpGet("/users/details/{id}")]
     public IActionResult Details(long id)
     {
         var user = _userService.GetUserById(id);
@@ -80,7 +82,7 @@ public class UsersController : Controller
         return View(model);
     }
 
-    [HttpGet("users/edit/")]
+    [HttpGet("/users/edit/")]
     public IActionResult Edit(long? id)
     {
         UserDetailsViewModel model;
@@ -145,6 +147,7 @@ public class UsersController : Controller
                 DateOfBirth = user.DateOfBirth,
                 Email = user.Email,
                 IsActive = user.IsActive
+                
             };
 
             _userService.Add(newUser);
@@ -163,7 +166,7 @@ public class UsersController : Controller
 
             if (changes != null)
             {
-                _logService.LogUpdateAction("Admin", changes, existingUser);
+                _logService.LogUpdateAction(GetCurrentUser(), changes, existingUser);
             }
 
             existingUser.Forename = user.Forename;
@@ -178,7 +181,7 @@ public class UsersController : Controller
         return RedirectToAction("List");
     }
 
-[HttpGet("users/delete/{id}")]
+    [HttpGet("/users/delete/{id}")]
     public IActionResult Delete(long id)
     {
         var user = _userService.GetUserById(id);
@@ -201,19 +204,36 @@ public class UsersController : Controller
         return View("ConfirmDelete", model);
     }
 
-    [HttpPost("users/delete/{id}")]
+    [HttpPost("/users/delete/{id}")]
     [ValidateAntiForgeryToken]
-    public IActionResult ConfirmDelete(UserDetailsViewModel model)
+    public IActionResult ConfirmDelete(long id)
     {
-        if (model == null || model.Id <= 0)
+        if (id <= 0)
         {
             return NotFound();
         }
 
-        _logService.LogDeleteAction("Admin", model.Id, model.Email);
+        var userToDelete = _userService.GetUserById(id);
 
-        _userService.Delete(new User { Id = model.Id });
+        if (userToDelete == null)
+        {
+            return NotFound();
+        }
+
+        _logService.LogDeleteAction(GetCurrentUser(), userToDelete.Id, userToDelete.Email);
+
+        _userService.Delete(userToDelete);
 
         return RedirectToAction("List");
+    }
+
+    private string GetCurrentUser()
+    {
+        if (User?.Identity?.IsAuthenticated ?? false)
+        {
+            return User.Identity.Name ?? "Unknown User";
+        }
+
+        return "Unknown User";
     }
 }

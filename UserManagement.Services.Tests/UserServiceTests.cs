@@ -1,5 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.DependencyInjection;
 using UserManagement.Models;
 using UserManagement.Services.Domain.Implementations;
 
@@ -85,5 +87,20 @@ public class UserServiceTests
     }
 
     private readonly Mock<IDataContext> _dataContext = new();
-    private UserService CreateService() => new(_dataContext.Object);
+
+    private UserService CreateService()
+    {
+        var serviceCollection = new ServiceCollection();
+
+        serviceCollection.AddSingleton(_dataContext.Object);
+
+        serviceCollection.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
+        serviceCollection.AddScoped<ILookupNormalizer, UpperInvariantLookupNormalizer>();
+
+        serviceCollection.AddScoped<UserService>();
+
+        var serviceProvider = serviceCollection.BuildServiceProvider();
+
+        return serviceProvider.GetRequiredService<UserService>();
+    }
 }

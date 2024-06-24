@@ -2,6 +2,9 @@ using System.Collections.Generic;
 using System;
 using System.Linq;
 using UserManagement.Models;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace UserManagement.Data.Tests;
 
@@ -108,18 +111,27 @@ public class DataContextTests
     [Fact]
     public void Delete_WhenExistingUser_RemovesUserFromContext()
     {
-        // Arrange
         var context = CreateContext();
         var user = context.GetAll<User>().First();
 
-        // Act
         context.Delete(user);
         var result = context.GetUserById<User>(user.Id).SingleOrDefault();
 
-        // Assert
         result.Should().BeNull();
     }
 
 
-    private DataContext CreateContext() => new();
+    private DataContext CreateContext() 
+    {
+        var serviceCollection = new ServiceCollection();
+        serviceCollection.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
+        serviceCollection.AddScoped<ILookupNormalizer, UpperInvariantLookupNormalizer>();
+
+        serviceCollection.AddDbContext<DataContext>(options =>
+            options.UseInMemoryDatabase(databaseName: "Test_Database"));
+
+        var serviceProvider = serviceCollection.BuildServiceProvider();
+
+        return serviceProvider.GetRequiredService<DataContext>();
+    }
 }

@@ -16,19 +16,19 @@ public class UserControllerTests
     {
         var controller = CreateController();
         var users = new List<User>
-        {
-            new User { Id = 1, Forename = "New", Surname = "User1", IsActive = true },
-            new User { Id = 2, Forename = "New", Surname = "User2", IsActive = true },
-            new User { Id = 3, Forename = "New", Surname = "User3", IsActive = false }
-        };
+    {
+        new User { Id = 1, Forename = "New", Surname = "User1", IsActive = true },
+        new User { Id = 2, Forename = "New", Surname = "User2", IsActive = true },
+        new User { Id = 3, Forename = "New", Surname = "User3", IsActive = false }
+    };
 
         _userService.Setup(userService => userService.GetAll()).Returns(users);
 
         var result = controller.List(null);
 
-        result.Model
-            .Should().BeOfType<UserListViewModel>()
-            .Which.Items.Should().BeEquivalentTo(users);
+        result.Model.Should().BeOfType<UserListViewModel>()
+            .Which.Items.Should().NotBeNullOrEmpty()
+            .And.BeEquivalentTo(MapUsersToViewModel(users));
     }
 
     [Fact]
@@ -43,7 +43,7 @@ public class UserControllerTests
             new User { Id = 3, Forename = "New", Surname = "User3", IsActive = false }
         };
 
-        var activeUsers = users.Where(u => u.IsActive).ToList();
+        var activeUsers = users.Where(user => user.IsActive).ToList();
 
         _userService.Setup(userService => userService.FilterByActive(true)).Returns(activeUsers);
 
@@ -188,7 +188,7 @@ public class UserControllerTests
         var result = controller.Save(user) as RedirectToActionResult;
 
         _userService.Verify(userService => userService.Update(It.Is<User>(u => u.Forename == user.Forename && u.Id == user.Id)));
-        _logService.Verify(logService => logService.LogUpdateAction("Admin", It.IsAny<List<string>>(), It.IsAny<User>()));
+        _logService.Verify(logService => logService.LogUpdateAction("Unknown User", It.IsAny<List<string>>(), It.IsAny<User>()));
         result?.ActionName.Should().Be("List");
     }
 
@@ -253,10 +253,10 @@ public class UserControllerTests
             IsActive = true
         };
 
-        var result = controller.ConfirmDelete(model) as RedirectToActionResult;
+        var result = controller.ConfirmDelete(model.Id) as RedirectToActionResult;
 
         _userService.Verify(userService => userService.Delete(It.Is<User>(u => u.Id == model.Id)));
-        _logService.Verify(logService => logService.LogDeleteAction("Admin", model.Id, model.Email));
+        _logService.Verify(logService => logService.LogDeleteAction("Unknown User", model.Id, model.Email));
         result?.ActionName.Should().Be("List");
     }
 
@@ -274,7 +274,7 @@ public class UserControllerTests
             IsActive = true
         };
 
-        var result = controller.ConfirmDelete(model);
+        var result = controller.ConfirmDelete(model.Id);
 
         result.Should().BeOfType<NotFoundResult>();
     }
@@ -326,6 +326,19 @@ public class UserControllerTests
             Email = model.Email,
             IsActive = model.IsActive
         };
+    }
+
+    private static List<UserListItemViewModel> MapUsersToViewModel(List<User> users)
+    {
+        return users.Select(user => new UserListItemViewModel
+        {
+            Id = user.Id,
+            Forename = user.Forename,
+            Surname = user.Surname,
+            DateOfBirth = new DateTime(),
+            Email = user.Email,
+            IsActive = user.IsActive
+        }).ToList();
     }
 
     private readonly Mock<IUserService> _userService = new();

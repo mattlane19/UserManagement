@@ -1,5 +1,8 @@
-﻿namespace UserManagement.WebMS.Controllers;
+﻿using Microsoft.AspNetCore.Authorization;
 
+namespace UserManagement.WebMS.Controllers;
+
+[Authorize]
 public class HomeController : Controller
 {
     [HttpGet]
